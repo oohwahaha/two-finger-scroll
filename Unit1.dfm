@@ -4,8 +4,8 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Settings - TwoFingerScroll'
-  ClientHeight = 288
-  ClientWidth = 280
+  ClientHeight = 343
+  ClientWidth = 320
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,8 +18,8 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object ok: TButton
-    Left = 117
-    Top = 255
+    Left = 157
+    Top = 311
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -29,8 +29,8 @@ object Form1: TForm1
     OnClick = okClick
   end
   object cancel: TButton
-    Left = 198
-    Top = 255
+    Left = 238
+    Top = 311
     Width = 75
     Height = 25
     Cancel = True
@@ -42,135 +42,213 @@ object Form1: TForm1
   object pages: TPageControl
     Left = 8
     Top = 8
-    Width = 265
-    Height = 241
-    ActivePage = generalTab
+    Width = 305
+    Height = 297
+    ActivePage = scrollTab
     TabOrder = 2
     object generalTab: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      object startWithWindows: TCheckBox
-        Left = 16
-        Top = 16
-        Width = 113
-        Height = 17
-        Caption = 'Start with Windows'
+      ExplicitWidth = 257
+      ExplicitHeight = 213
+      object GroupBox4: TGroupBox
+        Left = 3
+        Top = 3
+        Width = 306
+        Height = 254
+        Caption = 'Settings'
         TabOrder = 0
+        object startWithWindows: TCheckBox
+          Left = 16
+          Top = 24
+          Width = 113
+          Height = 17
+          Caption = 'Start with Windows'
+          TabOrder = 0
+        end
       end
     end
     object scrollTab: TTabSheet
       Caption = 'Scrolling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object scrollLinearAccLabel: TLabel
-        Left = 32
-        Top = 109
-        Width = 86
-        Height = 13
-        Caption = 'Scroll acceleration'
-        Enabled = False
-      end
-      object scrollCircular: TRadioButton
-        Left = 16
-        Top = 179
-        Width = 97
-        Height = 17
-        Caption = 'Circular (future)'
-        Enabled = False
-        TabOrder = 4
-        OnClick = scrollLinearClick
-      end
-      object scrollLinearAcc: TTrackBar
-        Left = 32
-        Top = 128
-        Width = 209
-        Height = 37
-        Enabled = False
-        Max = 100
-        Min = 30
-        Frequency = 5
-        Position = 40
-        TabOrder = 3
-      end
-      object scrollLinearEdge: TCheckBox
-        Left = 32
-        Top = 78
-        Width = 129
-        Height = 17
-        Caption = 'Keep scrolling on edges'
-        Enabled = False
-        TabOrder = 2
-      end
-      object scrollLinear: TRadioButton
-        Left = 16
-        Top = 47
-        Width = 49
-        Height = 17
-        Caption = 'Linear'
-        Checked = True
-        TabOrder = 1
-        TabStop = True
-        OnClick = scrollLinearClick
-      end
-      object scrollOff: TRadioButton
-        Left = 16
-        Top = 16
-        Width = 33
-        Height = 17
-        Caption = 'Off'
+      ExplicitWidth = 309
+      object GroupBox1: TGroupBox
+        Left = 3
+        Top = 3
+        Width = 182
+        Height = 150
+        Caption = 'Scroll type'
         TabOrder = 0
-        OnClick = scrollLinearClick
+        object scrollCircular: TRadioButton
+          Left = 16
+          Top = 115
+          Width = 97
+          Height = 17
+          Caption = 'Circular (future)'
+          Enabled = False
+          TabOrder = 0
+          OnClick = scrollLinearClick
+        end
+        object scrollLinearEdge: TCheckBox
+          Left = 32
+          Top = 85
+          Width = 129
+          Height = 17
+          Caption = 'Keep scrolling on edges'
+          Enabled = False
+          TabOrder = 1
+        end
+        object scrollLinear: TRadioButton
+          Left = 16
+          Top = 55
+          Width = 49
+          Height = 17
+          Caption = 'Linear'
+          Checked = True
+          TabOrder = 2
+          TabStop = True
+          OnClick = scrollLinearClick
+        end
+        object scrollOff: TRadioButton
+          Left = 16
+          Top = 24
+          Width = 33
+          Height = 17
+          Caption = 'Off'
+          TabOrder = 3
+          OnClick = scrollLinearClick
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 3
+        Top = 159
+        Width = 291
+        Height = 98
+        Caption = 'Settings'
+        TabOrder = 1
+        object scrollAccLabel: TLabel
+          Left = 16
+          Top = 27
+          Width = 86
+          Height = 13
+          Caption = 'Scroll acceleration'
+          Enabled = False
+        end
+        object scrollAcc: TTrackBar
+          Left = 16
+          Top = 46
+          Width = 261
+          Height = 37
+          Enabled = False
+          Max = 100
+          Min = 30
+          Frequency = 5
+          Position = 40
+          TabOrder = 0
+        end
+      end
+      object GroupBox3: TGroupBox
+        Left = 191
+        Top = 3
+        Width = 103
+        Height = 150
+        Caption = 'Scroll mode'
+        TabOrder = 2
+        object Label1: TLabel
+          Left = 15
+          Top = 116
+          Width = 33
+          Height = 13
+          Cursor = crHandPoint
+          Caption = 'Help...'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          OnClick = Label1Click
+        end
+        object scrollCompatible: TRadioButton
+          Left = 16
+          Top = 24
+          Width = 73
+          Height = 17
+          Caption = 'Compatible'
+          Checked = True
+          TabOrder = 0
+          TabStop = True
+        end
+        object scrollSmooth: TRadioButton
+          Left = 16
+          Top = 55
+          Width = 57
+          Height = 17
+          Caption = 'Smooth'
+          TabOrder = 1
+        end
+        object scrollSmart: TRadioButton
+          Left = 16
+          Top = 85
+          Width = 49
+          Height = 17
+          Caption = 'Smart'
+          TabOrder = 2
+        end
       end
     end
     object tapTab: TTabSheet
       Caption = 'Tapping'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object tapFunctionLabel: TLabel
-        Left = 32
-        Top = 52
-        Width = 41
-        Height = 13
-        Caption = 'Function'
-        Enabled = False
-      end
-      object tapFunction: TComboBox
-        Left = 32
-        Top = 71
-        Width = 121
-        Height = 19
-        Style = csOwnerDrawFixed
-        Enabled = False
-        ItemHeight = 13
-        ItemIndex = 2
-        TabOrder = 1
-        Text = 'Right button'
-        Items.Strings = (
-          'Left button'
-          'Middle button'
-          'Right button'
-          'Button 4'
-          'Button 5')
-      end
-      object tapActive: TCheckBox
-        Left = 16
-        Top = 16
-        Width = 49
-        Height = 17
-        Caption = 'Active'
+      ExplicitWidth = 257
+      ExplicitHeight = 213
+      object GroupBox5: TGroupBox
+        Left = 3
+        Top = 3
+        Width = 306
+        Height = 254
+        Caption = 'Settings'
         TabOrder = 0
-        OnClick = tapActiveClick
+        object tapFunctionLabel: TLabel
+          Left = 32
+          Top = 52
+          Width = 41
+          Height = 13
+          Caption = 'Function'
+          Enabled = False
+        end
+        object tapActive: TCheckBox
+          Left = 16
+          Top = 24
+          Width = 49
+          Height = 17
+          Caption = 'Active'
+          TabOrder = 0
+          OnClick = tapActiveClick
+        end
+        object tapFunction: TComboBox
+          Left = 32
+          Top = 71
+          Width = 121
+          Height = 19
+          Style = csOwnerDrawFixed
+          Enabled = False
+          ItemHeight = 13
+          ItemIndex = 2
+          TabOrder = 1
+          Text = 'Right button'
+          Items.Strings = (
+            'Left button'
+            'Middle button'
+            'Right button'
+            'Button 4'
+            'Button 5')
+        end
       end
     end
   end
   object defaults: TButton
     Left = 8
-    Top = 255
+    Top = 311
     Width = 75
     Height = 25
     Caption = 'Defaults'
@@ -206,10 +284,12 @@ object Form1: TForm1
     PopupMenu = PopupMenu1
     Visible = True
     OnDblClick = Settings1Click
-    Left = 200
+    Left = 80
+    Top = 312
   end
   object PopupMenu1: TPopupMenu
-    Left = 224
+    Left = 104
+    Top = 312
     object Settings1: TMenuItem
       Caption = 'Settings'
       Default = True
@@ -236,6 +316,7 @@ object Form1: TForm1
     Enabled = False
     Interval = 500
     OnTimer = reactivateTimerTimer
-    Left = 248
+    Left = 128
+    Top = 312
   end
 end

@@ -5,7 +5,8 @@
 
 #include "Unit1.h"
 #include "SynComDefs.h"
-#include <stdio.h>
+#include <shlwapi.h>
+#include <psapi.h>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "SYNCTRLLib_OCX"
@@ -13,6 +14,7 @@
 #pragma resource "*.dfm"
 
 static const UnicodeString regKey = "Software\\TwoFingerScroll";
+
 struct TTapInfo {
 	DWORD eventDown, eventUp, x;
 };
@@ -27,6 +29,82 @@ static const TTapInfo tapInfo[] = {
 
 TForm1 *Form1;
 //---------------------------------------------------------------------------
+
+UnicodeString __fastcall GetForegroundWindowBaseModuleName()
+{
+	HWND hWnd;
+
+	hWnd = GetForegroundWindow();
+	if (hWnd) {
+		DWORD dwProcessId;
+		HANDLE hProcess;
+
+		GetWindowThreadProcessId(hWnd, &dwProcessId);
+		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+			PROCESS_VM_READ, false, dwProcessId);
+		if (hProcess) {
+			HMODULE hMod;
+			DWORD cbNeeded;
+
+			if (EnumProcessModules(hProcess, &hMod, sizeof(hMod), &cbNeeded)) {
+				char szModule[MAX_PATH];
+
+				GetModuleBaseName(hProcess, hMod, szModule, MAX_PATH);
+				return UnicodeString(szModule);
+			}
+
+			CloseHandle(hProcess);
+		}
+	}
+
+	return UnicodeString();
+}
+//---------------------------------------------------------------------------
+
+int __fastcall GetScrollMode()
+{
+	UnicodeString name = GetForegroundWindowBaseModuleName();
+	int mode = 1;
+
+	if (name != "") {
+		TRegistry *reg;
+
+		reg = new TRegistry();
+		reg->RootKey = HKEY_CURRENT_USER;
+		if (reg->OpenKeyReadOnly(regKey + "\\scrollModeApps")) {
+			if (reg->ValueExists(name)) {
+				mode = reg->ReadInteger(name);
+			}
+			reg->CloseKey();
+		}
+	}
+	return mode;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall SetScrollMode(int mode)
+{
+	UnicodeString name = GetForegroundWindowBaseModuleName();
+
+	if (name != "") {
+		TRegistry *reg;
+
+		reg = new TRegistry();
+		reg->RootKey = HKEY_CURRENT_USER;
+		reg->Access = KEY_ALL_ACCESS;
+		if (reg->OpenKey(regKey + "\\scrollModeApps", true)) {
+			if (mode != 1) {
+				reg->WriteInteger(name, mode);
+			}
+			else {
+				reg->DeleteValue(name);
+            }
+			reg->CloseKey();
+		}
+	}
+}
+//---------------------------------------------------------------------------
+
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
@@ -103,8 +181,7 @@ void __fastcall TForm1::SettingsLoad(bool defaults)
 		settings->OpenKeyReadOnly(regKey);
 
 	if (settings->ValueExists("scroll")) {
-		int t = settings->ReadInteger("scroll");
-		switch (t) {
+		switch (settings->ReadInteger("scroll")) {
 		case 1:
 			scrollLinear->Checked = true;
 			break;
@@ -124,11 +201,25 @@ void __fastcall TForm1::SettingsLoad(bool defaults)
 	}
 	else scrollLinearEdge->Checked = true;
 
-	if (settings->ValueExists("scrollLinearAcc")) {
-		scrollLinearAcc->Position =
-			settings->ReadInteger("scrollLinearAcc");
+	if (settings->ValueExists("scrollAcc")) {
+		scrollAcc->Position =
+			settings->ReadInteger("scrollAcc");
 	}
-	else scrollLinearAcc->Position = 75;
+	else scrollAcc->Position = 75;
+
+	if (settings->ValueExists("scrollMode")) {
+		switch (settings->ReadInteger("scrollMode")) {
+		case 1:
+			scrollSmooth->Checked = true;
+			break;
+		case 2:
+			scrollSmart->Checked = true;
+			break;
+		default:
+			scrollCompatible->Checked = true;
+		}
+	}
+	else scrollCompatible->Checked = true;
 
 	if (settings->ValueExists("tapActive")) {
 		tapActive->Checked =
@@ -167,13 +258,14 @@ void __fastcall TForm1::SettingsSave()
 	if (!settings->OpenKey(regKey, true))
 		return;
 
-	int t = scrollLinear->Checked ? 1 :
-		(scrollCircular->Checked ? 2 : 0);
-	settings->WriteInteger("scroll", t);
+	settings->WriteInteger("scroll", scrollLinear->Checked ? 1 :
+		(scrollCircular->Checked ? 2 : 0));
 	settings->WriteInteger("scrollLinearEdge",
 		scrollLinearEdge->Checked);
-	settings->WriteInteger("scrollLinearAcc",
-		scrollLinearAcc->Position);
+	settings->WriteInteger("scrollAcc",
+		scrollAcc->Position);
+	settings->WriteInteger("scrollMode", scrollSmooth->Checked ? 1 :
+		(scrollSmart->Checked ? 2 : 0));
 	settings->WriteInteger("tapActive",
 		tapActive->Checked);
 	settings->WriteInteger("tapFunction",
@@ -259,8 +351,8 @@ void __fastcall TForm1::scrollLinearClick(TObject *Sender)
 	bool e = scrollLinear->Checked;
 
 	scrollLinearEdge->Enabled = e;
-	scrollLinearAccLabel->Enabled = e;
-	scrollLinearAcc->Enabled = e;
+	scrollAccLabel->Enabled = e;
+	scrollAcc->Enabled = e;
 }
 //---------------------------------------------------------------------------
 
@@ -358,6 +450,24 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 							SetCursorPos(scrollTouchPos.x,
 								scrollTouchPos.y);
 						}
+						if (scrollCompatible->Checked) {
+							scrollMode = 0;
+						}
+						else if (scrollSmooth->Checked) {
+							scrollMode = 1;
+						}
+						else {
+							scrollMode = GetScrollMode();
+							if ((GetKeyState(VK_SHIFT) & 0x8000) &&
+									(GetKeyState(VK_CONTROL) & 0x8000) &&
+									(GetKeyState(VK_MENU) & 0x8000)) {
+								// toggle scroll mode
+								if (scrollMode == 1) scrollMode = 0;
+								else scrollMode = 1;
+								SetScrollMode(scrollMode);
+							}
+
+						}
 					}
 					if (IsPadAcquired) {
 						DoScroll(xd, yd);
@@ -409,14 +519,17 @@ void __fastcall TForm1::DoScroll(long dx, long dy)
 	if (abs(dy) > 800)
 		return;
 
-	d = dy * dy / (scrollLinearAcc->Max - scrollLinearAcc->Position +
-		scrollLinearAcc->Min);
+	d = dy * dy / (scrollAcc->Max - scrollAcc->Position + scrollAcc->Min);
 	if (d < 10)
 		d = 10;
 	if (dy < 0)
 		d = -d;
-	scrollBuffer += d;
-	d = scrollBuffer - scrollBuffer % WHEEL_DELTA;
+
+	if (scrollMode == 0) {
+		// compatibility mode
+		scrollBuffer += d;
+		d = scrollBuffer - scrollBuffer % WHEEL_DELTA;
+	}
 
 	if (d != 0) {
 		INPUT i;
@@ -427,7 +540,8 @@ void __fastcall TForm1::DoScroll(long dx, long dy)
 		i.mi.mouseData = d;
 		SendInput(1, &i, sizeof(INPUT));
 
-		scrollBuffer -= d;
+		if (scrollMode == 0) // compatibility mode
+			scrollBuffer -= d;
 	}
 }
 //---------------------------------------------------------------------------
@@ -448,10 +562,15 @@ void __fastcall TForm1::cancelClick(TObject *Sender)
 
 void __fastcall TForm1::About1Click(TObject *Sender)
 {
-	Application->MessageBox(L"TwoFingerScroll 1.0.1\n"
+	Application->MessageBox(L"TwoFingerScroll 1.0.2\n"
 		"\n"
 		"Copyright (c) 2008 Arkadiusz Wahlig\n"
-		"<arkadiusz.wahlig@gmail.com>",
+		"<arkadiusz.wahlig@gmail.com>\n"
+		"\n"
+		"Published under the Apache 2.0 License.\n"
+		"\n"
+		"Project home:\n"
+		"http://code.google.com/p/two-finger-scroll",
 		L"About...");
 }
 //---------------------------------------------------------------------------
@@ -485,6 +604,27 @@ void __fastcall TForm1::reactivateTimerTimer(TObject *Sender)
 	if (!reactivateTimer->Tag) {
 		reactivateTimer->Enabled = false;
 	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Label1Click(TObject *Sender)
+{
+	Application->MessageBox(
+		L"Compatible:\n"
+		"The scroll closely simulates a mouse scroll wheel. This mode works with\n"
+		"most applications.\n"
+		"\n"
+		"Smooth:\n"
+		"Smooth scrolling. Some older applications may not work propery in this\n"
+		"scroll mode.\n"
+		"\n"
+		"Smart:\n"
+		"Uses smooth scrolling by default. Compatible mode can be enabled for\n"
+		"specifc applications by scrolling within them while keeping SHIFT, CTRL\n"
+		"and ALT keys pressed down. The setting is remembered, all future scrolls\n"
+		"in the same application will use the compatible mode. Scrolling with the\n"
+		"keys again reverts back to the smooth mode.",
+		L"Scroll mode");
 }
 //---------------------------------------------------------------------------
 

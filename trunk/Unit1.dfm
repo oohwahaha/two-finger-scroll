@@ -49,8 +49,10 @@ object Form1: TForm1
     object generalTab: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      ExplicitWidth = 257
-      ExplicitHeight = 213
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox4: TGroupBox
         Left = 3
         Top = 3
@@ -70,7 +72,6 @@ object Form1: TForm1
     end
     object scrollTab: TTabSheet
       Caption = 'Scrolling'
-      ExplicitWidth = 309
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -139,7 +140,7 @@ object Form1: TForm1
           Width = 261
           Height = 37
           Enabled = False
-          Max = 100
+          Max = 120
           Min = 30
           Frequency = 5
           Position = 40
@@ -199,8 +200,10 @@ object Form1: TForm1
     object tapTab: TTabSheet
       Caption = 'Tapping'
       ImageIndex = 1
-      ExplicitWidth = 257
-      ExplicitHeight = 213
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox5: TGroupBox
         Left = 3
         Top = 3

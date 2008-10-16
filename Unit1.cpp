@@ -408,7 +408,7 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 			long tstamp;
 			synPacket->GetProperty(SP_TimeStamp, &tstamp);
 			if ((tstamp - tapStartTime < 175) &&
-				(tapDistance < 100))
+				(tapDistance < 15))
 			{
 				SetCursorPos(tapTouchPos.x,
 					tapTouchPos.y);
@@ -436,7 +436,8 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 					if (ylo <= y && y <= yhi) {
 						scrollNotEdge = true;
 					}
-					else if (scrollNotEdge) {
+					else if (scrollNotEdge && ((y < ylo && scrollLastYDelta < 0) ||
+							(y > yhi && scrollLastYDelta > 0))) {
 						DoScroll(scrollLastXDelta, scrollLastYDelta);
 						return 0;
 					}
@@ -446,7 +447,7 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 						AcquirePad(true);
 						long tstamp;
 						synPacket->GetProperty(SP_TimeStamp, &tstamp);
-						if (tstamp - scrollTouchTime < 200) {
+						if (tstamp - scrollTouchTime < 1000) {
 							SetCursorPos(scrollTouchPos.x,
 								scrollTouchPos.y);
 						}
@@ -520,8 +521,8 @@ void __fastcall TForm1::DoScroll(long dx, long dy)
 		return;
 
 	d = dy * dy / (scrollAcc->Max - scrollAcc->Position + scrollAcc->Min);
-	if (d < 10)
-		d = 10;
+	if (d < 4)
+		d = 4;
 	if (dy < 0)
 		d = -d;
 

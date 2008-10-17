@@ -234,6 +234,12 @@ void __fastcall TForm1::SettingsLoad(bool defaults)
 	}
 	else tapFunction->ItemIndex = 1;
 
+	if (settings->ValueExists("tapMaxDistance")) {
+		tapMaxDistance->Position =
+			settings->ReadInteger("tapMaxDistance");
+	}
+	else tapMaxDistance->Position = 50;
+
 	settings->CloseKey();
 
 	TRegistry *reg = new TRegistry();
@@ -270,6 +276,8 @@ void __fastcall TForm1::SettingsSave()
 		tapActive->Checked);
 	settings->WriteInteger("tapFunction",
 		tapFunction->ItemIndex);
+	settings->WriteInteger("tapMaxDistance",
+		tapMaxDistance->Position);
 
 	settings->CloseKey();
 
@@ -362,6 +370,8 @@ void __fastcall TForm1::tapActiveClick(TObject *Sender)
 
 	tapFunctionLabel->Enabled = e;
 	tapFunction->Enabled = e;
+	tapMaxDistanceLabel->Enabled = e;
+	tapMaxDistance->Enabled = e;
 }
 //---------------------------------------------------------------------------
 
@@ -408,7 +418,7 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 			long tstamp;
 			synPacket->GetProperty(SP_TimeStamp, &tstamp);
 			if ((tstamp - tapStartTime < 175) &&
-				(tapDistance < 15))
+				(tapDistance < tapMaxDistance->Position))
 			{
 				SetCursorPos(tapTouchPos.x,
 					tapTouchPos.y);
@@ -563,7 +573,7 @@ void __fastcall TForm1::cancelClick(TObject *Sender)
 
 void __fastcall TForm1::About1Click(TObject *Sender)
 {
-	Application->MessageBox(L"TwoFingerScroll 1.0.2\n"
+	Application->MessageBox(L"TwoFingerScroll 1.0.3\n"
 		"\n"
 		"Copyright (c) 2008 Arkadiusz Wahlig\n"
 		"<arkadiusz.wahlig@gmail.com>\n"

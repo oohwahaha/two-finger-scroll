@@ -53,6 +53,8 @@ __published:	// IDE-verwaltete Komponenten
 	TComboBox *tapFunction;
 	TLabel *tapFunctionLabel;
 	TRadioButton *scrollSmart;
+	TLabel *tapMaxDistanceLabel;
+	TTrackBar *tapMaxDistance;
 	void __fastcall Settings1Click(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall scrollLinearClick(TObject *Sender);

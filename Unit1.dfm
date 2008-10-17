@@ -44,15 +44,11 @@ object Form1: TForm1
     Top = 8
     Width = 305
     Height = 297
-    ActivePage = scrollTab
+    ActivePage = tapTab
     TabOrder = 2
     object generalTab: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox4: TGroupBox
         Left = 3
         Top = 3
@@ -200,10 +196,6 @@ object Form1: TForm1
     object tapTab: TTabSheet
       Caption = 'Tapping'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox5: TGroupBox
         Left = 3
         Top = 3
@@ -217,6 +209,14 @@ object Form1: TForm1
           Width = 41
           Height = 13
           Caption = 'Function'
+          Enabled = False
+        end
+        object tapMaxDistanceLabel: TLabel
+          Left = 32
+          Top = 104
+          Width = 165
+          Height = 13
+          Caption = 'Maximal finger movement distance'
           Enabled = False
         end
         object tapActive: TCheckBox
@@ -245,6 +245,18 @@ object Form1: TForm1
             'Right button'
             'Button 4'
             'Button 5')
+        end
+        object tapMaxDistance: TTrackBar
+          Left = 32
+          Top = 123
+          Width = 249
+          Height = 38
+          Enabled = False
+          Max = 100
+          Min = 5
+          Frequency = 5
+          Position = 5
+          TabOrder = 2
         end
       end
     end

@@ -58,6 +58,21 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
+			<ResFiles Include="TwoFingerScroll.res">
+				<BuildOrder>1</BuildOrder>
+			</ResFiles>
+			<CppCompile Include="TwoFingerScroll.cpp">
+				<BuildOrder>0</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="Unit1.cpp">
+				<Form>Form1</Form>
+				<DependentOn>Unit1.h</DependentOn>
+				<BuildOrder>2</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="SYNCOMLib_OCX.cpp">
+				<DependentOn>SYNCOMLib_OCX.h</DependentOn>
+				<BuildOrder>3</BuildOrder>
+			</CppCompile>
 			<CppCompile Include="SYNCOMLib_TLB.cpp">
 				<DependentOn>SYNCOMLib_TLB.h</DependentOn>
 				<BuildOrder>4</BuildOrder>
@@ -70,21 +85,6 @@
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>6</BuildOrder>
 			</LibFiles>
-			<CppCompile Include="SYNCOMLib_OCX.cpp">
-				<DependentOn>SYNCOMLib_OCX.h</DependentOn>
-				<BuildOrder>3</BuildOrder>
-			</CppCompile>
-			<ResFiles Include="TwoFingerScroll.res">
-				<BuildOrder>1</BuildOrder>
-			</ResFiles>
-			<CppCompile Include="TwoFingerScroll.cpp">
-				<BuildOrder>0</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="Unit1.cpp">
-				<Form>Form1</Form>
-				<DependentOn>Unit1.h</DependentOn>
-				<BuildOrder>2</BuildOrder>
-			</CppCompile>
 			<FormResources Include="Unit1.dfm"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
@@ -112,7 +112,7 @@
 						<VersionInfo Name="AutoIncBuild">True</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
-						<VersionInfo Name="Release">3</VersionInfo>
+						<VersionInfo Name="Release">4</VersionInfo>
 						<VersionInfo Name="Build">0</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
@@ -125,13 +125,13 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.0.3.0</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.4.0</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright"/>
 						<VersionInfoKeys Name="LegalTrademarks"/>
 						<VersionInfoKeys Name="OriginalFilename"/>
 						<VersionInfoKeys Name="ProductName"/>
-						<VersionInfoKeys Name="ProductVersion">1.0.3</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">1.0.4</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Debugging>

@@ -78,6 +78,7 @@ private:	// Benutzer Deklarationen
 	bool IsPadAcquired;
 	int deviceTapLockLevel;
 	long synTouchPadGestures;
+	int tapMaxFingers;
 	bool tapInProgress;
 	long tapStartTime, scrollTouchTime;
 	long tapDistance;

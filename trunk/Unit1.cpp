@@ -400,7 +400,11 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 
 	// handle tapping
 	if (tapActive->Checked) {
-		if (nof == 2) {
+		if (fstate & SF_FingerPresent) {
+			if (nof > tapMaxFingers) tapMaxFingers = nof;
+		}
+		else tapMaxFingers = 0;
+		if ((nof == 2) && (tapMaxFingers == 2)) {
 			if (!tapInProgress) {
 				tapInProgress = true;
 				synPacket->GetProperty(SP_TimeStamp,
@@ -417,7 +421,8 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 			LockDeviceTap(false);
 			long tstamp;
 			synPacket->GetProperty(SP_TimeStamp, &tstamp);
-			if ((tstamp - tapStartTime < 175) &&
+			if ((nof < 2) &&
+				(tstamp - tapStartTime < 175) &&
 				(tapDistance < tapMaxDistance->Position))
 			{
 				SetCursorPos(tapTouchPos.x,
@@ -573,7 +578,7 @@ void __fastcall TForm1::cancelClick(TObject *Sender)
 
 void __fastcall TForm1::About1Click(TObject *Sender)
 {
-	Application->MessageBox(L"TwoFingerScroll 1.0.3\n"
+	Application->MessageBox(L"TwoFingerScroll 1.0.4\n"
 		"\n"
 		"Copyright (c) 2008 Arkadiusz Wahlig\n"
 		"<arkadiusz.wahlig@gmail.com>\n"

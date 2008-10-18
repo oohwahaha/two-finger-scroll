@@ -146,7 +146,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 			if (mask == 0xFFFFFFFF) {
 				Application->MessageBox(L"Driver support for multiple fingers is already enabled but\n"
 					"the driver still doesn't report multiple fingers. Either you haven't restarted\n"
-					"the system yet or your TouchPad doesn't support multiple fingers."
+					"the system yet or your TouchPad doesn't support multiple fingers.",
 					L"TwoFingerScroll");
 				Application->Terminate();
 			}

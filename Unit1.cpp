@@ -120,7 +120,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 		&devHandle);
 
 	if (devHandle < 0) {
-		Application->MessageBox(L"No Synaptics TouchPad found!",
+		Application->MessageBox(L"No Synaptics TouchPad device found!",
 			L"TwoFingerScroll");
 		Application->Terminate();
 	}
@@ -136,7 +136,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 		reg->RootKey = HKEY_LOCAL_MACHINE;
 		reg->Access = KEY_ALL_ACCESS;
 		if (!reg->OpenKey("System\\CurrentControlSet\\Services\\SynTP\\Parameters", false)) {
-			Application->MessageBox(L"Synaptics driver registry key missing. Reinstall drivers.",
+			Application->MessageBox(L"Synaptics kernel driver registry keys missing. Reinstall drivers.",
 				L"TwoFingerScroll");
 			Application->Terminate();
 		}
@@ -144,7 +144,9 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 		if (reg->ValueExists("CapabilitiesMask")) {
 			mask = reg->ReadInteger("CapabilitiesMask");
 			if (mask == 0xFFFFFFFF) {
-				Application->MessageBox(L"This TouchPad doesn't support multiple fingers.",
+				Application->MessageBox(L"Driver support for multiple fingers is already enabled but\n"
+					"the driver still doesn't report multiple fingers. Either you haven't restarted\n"
+					"the system yet or your TouchPad doesn't support multiple fingers."
 					L"TwoFingerScroll");
 				Application->Terminate();
 			}
@@ -152,14 +154,10 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 		if (mask != 0xFFFFFFFF) {
 			reg->WriteInteger("CapabilitiesMask", 0xFFFFFFFF);
 			reg->CloseKey();
-			if (Application->MessageBox(L"Driver support for multiple fingers has been enabled.\n"
-				"System restart is required for the changes to take effect.\n"
-				"\n"
-				"Restart now?",
-				L"TwoFingerScroll", MB_YESNO) == IDYES)
-			{
-				ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_APPLICATION);
-			}
+			Application->MessageBox(L"Driver support for multiple fingers has been enabled.\n"
+            	"\n"
+				"Restart system for the changes to take effect.",
+				L"TwoFingerScroll");
 			Application->Terminate();
 		}
 		reg->CloseKey();

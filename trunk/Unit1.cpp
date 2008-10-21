@@ -20,6 +20,7 @@ struct TTapInfo {
 };
 
 static const TTapInfo tapInfo[] = {
+	{0, 0, 0}, // disabled
 	{MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, 0},
 	{MOUSEEVENTF_MIDDLEDOWN, MOUSEEVENTF_MIDDLEUP, 0},
 	{MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, 0},
@@ -199,6 +200,19 @@ void __fastcall TForm1::SettingsLoad(bool defaults)
 	}
 	else scrollLinearEdge->Checked = true;
 
+	if (settings->ValueExists("scrollSpeed")) {
+		scrollSpeed->Position =
+			settings->ReadInteger("scrollSpeed");
+	}
+	else scrollSpeed->Position = 100;
+
+	if (settings->ValueExists("scrollAccEnabled")) {
+		scrollAccEnabled->Checked =
+			settings->ReadInteger("scrollAccEnabled");
+	}
+	else scrollAccEnabled->Checked = true;
+	scrollAccEnabledClick(NULL);
+
 	if (settings->ValueExists("scrollAcc")) {
 		scrollAcc->Position =
 			settings->ReadInteger("scrollAcc");
@@ -219,18 +233,17 @@ void __fastcall TForm1::SettingsLoad(bool defaults)
 	}
 	else scrollCompatible->Checked = true;
 
-	if (settings->ValueExists("tapActive")) {
-		tapActive->Checked =
-			settings->ReadInteger("tapActive");
+	if (settings->ValueExists("tapTwo")) {
+		tapTwo->ItemIndex =
+			settings->ReadInteger("tapTwo");
 	}
-	else tapActive->Checked = false;
-	tapActiveClick(NULL);
+	else tapTwo->ItemIndex = 0;
 
-	if (settings->ValueExists("tapFunction")) {
-		tapFunction->ItemIndex =
-			settings->ReadInteger("tapFunction");
+	if (settings->ValueExists("tapThree")) {
+		tapThree->ItemIndex =
+			settings->ReadInteger("tapThree");
 	}
-	else tapFunction->ItemIndex = 1;
+	else tapThree->ItemIndex = 0;
 
 	if (settings->ValueExists("tapMaxDistance")) {
 		tapMaxDistance->Position =
@@ -262,20 +275,15 @@ void __fastcall TForm1::SettingsSave()
 	if (!settings->OpenKey(regKey, true))
 		return;
 
-	settings->WriteInteger("scroll", scrollLinear->Checked ? 1 :
-		(scrollCircular->Checked ? 2 : 0));
-	settings->WriteInteger("scrollLinearEdge",
-		scrollLinearEdge->Checked);
-	settings->WriteInteger("scrollAcc",
-		scrollAcc->Position);
-	settings->WriteInteger("scrollMode", scrollSmooth->Checked ? 1 :
-		(scrollSmart->Checked ? 2 : 0));
-	settings->WriteInteger("tapActive",
-		tapActive->Checked);
-	settings->WriteInteger("tapFunction",
-		tapFunction->ItemIndex);
-	settings->WriteInteger("tapMaxDistance",
-		tapMaxDistance->Position);
+	settings->WriteInteger("scroll", scrollLinear->Checked ? 1 : (scrollCircular->Checked ? 2 : 0));
+	settings->WriteInteger("scrollLinearEdge", scrollLinearEdge->Checked);
+	settings->WriteInteger("scrollSpeed", scrollSpeed->Position);
+	settings->WriteInteger("scrollAccEnabled", scrollAccEnabled->Checked);
+	settings->WriteInteger("scrollAcc", scrollAcc->Position);
+	settings->WriteInteger("scrollMode", scrollSmooth->Checked ? 1 : (scrollSmart->Checked ? 2 : 0));
+	settings->WriteInteger("tapTwo", tapTwo->ItemIndex);
+	settings->WriteInteger("tapThree", tapThree->ItemIndex);
+	settings->WriteInteger("tapMaxDistance", tapMaxDistance->Position);
 
 	settings->CloseKey();
 
@@ -357,19 +365,10 @@ void __fastcall TForm1::scrollLinearClick(TObject *Sender)
 	bool e = scrollLinear->Checked;
 
 	scrollLinearEdge->Enabled = e;
-	scrollAccLabel->Enabled = e;
+	scrollSpeedLabel->Enabled = e;
+	scrollSpeed->Enabled = e;
+	scrollAccEnabled->Enabled = e;
 	scrollAcc->Enabled = e;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::tapActiveClick(TObject *Sender)
-{
-	bool e = tapActive->Checked;
-
-	tapFunctionLabel->Enabled = e;
-	tapFunction->Enabled = e;
-	tapMaxDistanceLabel->Enabled = e;
-	tapMaxDistance->Enabled = e;
 }
 //---------------------------------------------------------------------------
 
@@ -397,7 +396,7 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 	synPacket->GetProperty(SP_YDelta, &yd);
 
 	// handle tapping
-	if (tapActive->Checked) {
+	if (tapTwo->ItemIndex > 0) {
 		if (fstate & SF_FingerPresent) {
 			if (nof > tapMaxFingers) tapMaxFingers = nof;
 		}
@@ -513,7 +512,7 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 void __fastcall TForm1::DoTap()
 {
 	INPUT i[2];
-	const TTapInfo *info = &tapInfo[tapFunction->ItemIndex];
+	const TTapInfo *info = &tapInfo[tapTwo->ItemIndex];
 
 	ZeroMemory(i, sizeof(INPUT)*2);
 	i[0].type = INPUT_MOUSE;
@@ -533,11 +532,17 @@ void __fastcall TForm1::DoScroll(long dx, long dy)
 	if (abs(dy) > 800)
 		return;
 
-	d = dy * dy / (scrollAcc->Max - scrollAcc->Position + scrollAcc->Min);
-	if (d < 4)
-		d = 4;
-	if (dy < 0)
-		d = -d;
+	// scrollSpeed
+	dy = dy * scrollSpeed->Position / 100;
+
+	if (scrollAccEnabled->Checked) {
+		d = dy * dy / (scrollAcc->Max - scrollAcc->Position + scrollAcc->Min);
+		if (d < 4)
+			d = 4;
+		if (dy < 0)
+			d = -d;
+	}
+	else d = dy;
 
 	if (scrollMode == 0) {
 		// compatibility mode
@@ -639,6 +644,12 @@ void __fastcall TForm1::Label1Click(TObject *Sender)
 		"in the same application will use the compatible mode. Scrolling with the\n"
 		"keys again reverts back to the smooth mode.",
 		L"Scroll mode");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::scrollAccEnabledClick(TObject *Sender)
+{
+	scrollAcc->Enabled = scrollAccEnabled->Checked;
 }
 //---------------------------------------------------------------------------
 

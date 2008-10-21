@@ -44,19 +44,15 @@ object Form1: TForm1
     Top = 8
     Width = 305
     Height = 297
-    ActivePage = tapTab
+    ActivePage = scrollTab
     TabOrder = 2
     object generalTab: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox4: TGroupBox
         Left = 3
         Top = 3
-        Width = 306
+        Width = 291
         Height = 254
         Caption = 'Settings'
         TabOrder = 0
@@ -72,10 +68,6 @@ object Form1: TForm1
     end
     object scrollTab: TTabSheet
       Caption = 'Scrolling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -130,25 +122,44 @@ object Form1: TForm1
         Height = 98
         Caption = 'Settings'
         TabOrder = 1
-        object scrollAccLabel: TLabel
+        object scrollSpeedLabel: TLabel
           Left = 16
-          Top = 27
-          Width = 86
+          Top = 26
+          Width = 30
           Height = 13
-          Caption = 'Scroll acceleration'
-          Enabled = False
+          Caption = 'Speed'
         end
         object scrollAcc: TTrackBar
-          Left = 16
-          Top = 46
-          Width = 261
-          Height = 37
+          Left = 152
+          Top = 47
+          Width = 125
+          Height = 34
           Enabled = False
           Max = 120
           Min = 30
-          Frequency = 5
+          Frequency = 10
           Position = 40
           TabOrder = 0
+        end
+        object scrollAccEnabled: TCheckBox
+          Left = 152
+          Top = 24
+          Width = 81
+          Height = 17
+          Caption = 'Acceleration'
+          TabOrder = 1
+          OnClick = scrollAccEnabledClick
+        end
+        object scrollSpeed: TTrackBar
+          Left = 16
+          Top = 47
+          Width = 124
+          Height = 34
+          Max = 200
+          Min = 10
+          Frequency = 21
+          Position = 10
+          TabOrder = 2
         end
       end
       object GroupBox3: TGroupBox
@@ -204,67 +215,84 @@ object Form1: TForm1
     object tapTab: TTabSheet
       Caption = 'Tapping'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 28
       object GroupBox5: TGroupBox
         Left = 3
         Top = 3
-        Width = 306
+        Width = 291
         Height = 254
         Caption = 'Settings'
         TabOrder = 0
-        object tapFunctionLabel: TLabel
-          Left = 32
-          Top = 52
-          Width = 41
-          Height = 13
-          Caption = 'Function'
-          Enabled = False
-        end
         object tapMaxDistanceLabel: TLabel
-          Left = 32
-          Top = 104
+          Left = 16
+          Top = 144
           Width = 165
           Height = 13
           Caption = 'Maximal finger movement distance'
-          Enabled = False
         end
-        object tapActive: TCheckBox
+        object Label2: TLabel
           Left = 16
           Top = 24
-          Width = 49
-          Height = 17
-          Caption = 'Active'
-          TabOrder = 0
-          OnClick = tapActiveClick
+          Width = 90
+          Height = 13
+          Caption = 'Two finger tapping'
         end
-        object tapFunction: TComboBox
-          Left = 32
-          Top = 71
-          Width = 121
+        object Label3: TLabel
+          Left = 16
+          Top = 83
+          Width = 98
+          Height = 13
+          Caption = 'Three finger tapping'
+          Enabled = False
+        end
+        object tapMaxDistance: TTrackBar
+          Left = 16
+          Top = 163
+          Width = 257
+          Height = 38
+          Max = 100
+          Min = 5
+          Frequency = 5
+          Position = 5
+          TabOrder = 0
+        end
+        object tapTwo: TComboBox
+          Left = 16
+          Top = 43
+          Width = 257
           Height = 19
           Style = csOwnerDrawFixed
-          Enabled = False
           ItemHeight = 13
-          ItemIndex = 2
+          ItemIndex = 0
           TabOrder = 1
-          Text = 'Right button'
+          Text = 'Disabled'
           Items.Strings = (
+            'Disabled'
             'Left button'
             'Middle button'
             'Right button'
             'Button 4'
             'Button 5')
         end
-        object tapMaxDistance: TTrackBar
-          Left = 32
-          Top = 123
-          Width = 249
-          Height = 38
+        object tapThree: TComboBox
+          Left = 16
+          Top = 102
+          Width = 257
+          Height = 19
+          Style = csOwnerDrawFixed
           Enabled = False
-          Max = 100
-          Min = 5
-          Frequency = 5
-          Position = 5
+          ItemHeight = 13
+          ItemIndex = 0
           TabOrder = 2
+          Text = 'Disabled'
+          Items.Strings = (
+            'Disabled'
+            'Left button'
+            'Middle button'
+            'Right button'
+            'Button 4'
+            'Button 5')
         end
       end
     end

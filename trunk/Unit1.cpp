@@ -233,11 +233,23 @@ void __fastcall TForm1::SettingsLoad(bool defaults)
 	}
 	else scrollCompatible->Checked = true;
 
+	if (settings->ValueExists("tapOneOne")) {
+		tapOneOne->ItemIndex =
+			settings->ReadInteger("tapOneOne");
+	}
+	else tapOneOne->ItemIndex = 0;
+
 	if (settings->ValueExists("tapTwo")) {
 		tapTwo->ItemIndex =
 			settings->ReadInteger("tapTwo");
 	}
 	else tapTwo->ItemIndex = 0;
+
+	if (settings->ValueExists("tapTwoOne")) {
+		tapTwoOne->ItemIndex =
+			settings->ReadInteger("tapTwoOne");
+	}
+	else tapTwoOne->ItemIndex = 0;
 
 	if (settings->ValueExists("tapThree")) {
 		tapThree->ItemIndex =
@@ -281,7 +293,9 @@ void __fastcall TForm1::SettingsSave()
 	settings->WriteInteger("scrollAccEnabled", scrollAccEnabled->Checked);
 	settings->WriteInteger("scrollAcc", scrollAcc->Position);
 	settings->WriteInteger("scrollMode", scrollSmooth->Checked ? 1 : (scrollSmart->Checked ? 2 : 0));
+	settings->WriteInteger("tapOneOne", tapOneOne->ItemIndex);
 	settings->WriteInteger("tapTwo", tapTwo->ItemIndex);
+	settings->WriteInteger("tapTwoOne", tapTwoOne->ItemIndex);
 	settings->WriteInteger("tapThree", tapThree->ItemIndex);
 	settings->WriteInteger("tapMaxDistance", tapMaxDistance->Position);
 
@@ -319,7 +333,7 @@ void __fastcall TForm1::LockDeviceTap(bool lock)
 {
 	long gest;
 
-	if (lock != synTapLocked) {
+	if (lock != IsDeviceTapLocked) {
 		if (lock) {
 			synTouchPad->GetProperty(SP_Gestures, &gest);
 			if (gest & SF_GestureTap) {
@@ -334,7 +348,7 @@ void __fastcall TForm1::LockDeviceTap(bool lock)
 			else gest &= ~SF_GestureTap;
 			synTouchPad->SetProperty(SP_Gestures, gest);
 		}
-		synTapLocked = lock;
+		IsDeviceTapLocked = lock;
 	}
 }
 //---------------------------------------------------------------------------
@@ -399,31 +413,47 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 			tapDistance = 0;
 			LockDeviceTap(true);
 		}
-		if (tapLastNof == 0)
+		if (tapLastNof == 0) {
+			synPacket->GetProperty(SP_TimeStamp,
+				&tapTouchTime);
 			GetCursorPos(&tapTouchPos);
+		}
 	}
 	else if (nof < tapLastNof) {
-		LockDeviceTap(false);
-		long tstamp;
-		synPacket->GetProperty(SP_TimeStamp, &tstamp);
-		if ((tstamp - tapStartTime < 175) &&
-			(tapDistance < tapMaxDistance->Position))
+		if ((tapDistance < tapMaxDistance->Position) &&
+			(tapLastNof >= 2))
 		{
-			SetCursorPos(tapTouchPos.x,
-				tapTouchPos.y);
+			bool ok = false;
+			long tstamp;
+			synPacket->GetProperty(SP_TimeStamp, &tstamp);
+			if (tstamp - tapTouchTime < 175) {
+				if (tapLastNof == 2)
+					ok = DoTap(tapTwo->ItemIndex);
+				else if (tapLastNof == 3)
+					ok = DoTap(tapThree->ItemIndex);
+			}
+			else if (tstamp - tapStartTime < 175) {
+				if (tapLastNof == 2)
+					ok = DoTap(tapOneOne->ItemIndex);
+				else if (tapLastNof == 3)
+					ok = DoTap(tapTwoOne->ItemIndex);
+			}
+			if (ok)
+				SetCursorPos(tapTouchPos.x, tapTouchPos.y);
 
-			if (tapLastNof == 2)
-				DoTap(tapTwo->ItemIndex);
-			else if (tapLastNof == 3)
-				DoTap(tapThree->ItemIndex);
-
+			// prevent tap trigger until initiated again
+			tapStartTime -= 175;
 			tapLastNof = nof;
 			return 0;
 		}
 	}
+	if (IsDeviceTapLocked) {
+		if (abs(xd) < 800) tapDistance += abs(xd);
+		if (abs(yd) < 800) tapDistance += abs(yd);
+		if (!(fstate & SF_FingerPresent))
+			LockDeviceTap(false);
+	}
 	tapLastNof = nof;
-	if (abs(xd) < 800) tapDistance += abs(xd);
-	if (abs(yd) < 800) tapDistance += abs(yd);
 
 	// handle scrolling
 	if (scrollLinear->Checked) {
@@ -503,12 +533,12 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm1::DoTap(int index)
+bool __fastcall TForm1::DoTap(int index)
 {
 	INPUT i[2];
 	const TTapInfo *info = &tapInfo[index];
 
-	if (info->eventDown == 0) return; // tapping disabled
+	if (info->eventDown == 0) return false; // tapping disabled
 
 	ZeroMemory(i, sizeof(INPUT)*2);
 	i[0].type = INPUT_MOUSE;
@@ -518,15 +548,17 @@ void __fastcall TForm1::DoTap(int index)
 	i[1].mi.dwFlags = info->eventUp;
 	i[1].mi.mouseData = info->x;
 	SendInput(2, i, sizeof(INPUT));
+
+	return true;
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm1::DoScroll(long dx, long dy)
+bool __fastcall TForm1::DoScroll(long dx, long dy)
 {
 	long d;
 
 	if (abs(dy) > 800)
-		return;
+		return false;
 
 	// scrollSpeed
 	dy = dy * scrollSpeed->Position / 100;
@@ -559,6 +591,8 @@ void __fastcall TForm1::DoScroll(long dx, long dy)
 		if (scrollMode == 0) // compatibility mode
 			scrollBuffer -= d;
 	}
+
+	return true;
 }
 //---------------------------------------------------------------------------
 
@@ -578,7 +612,7 @@ void __fastcall TForm1::cancelClick(TObject *Sender)
 
 void __fastcall TForm1::About1Click(TObject *Sender)
 {
-	Application->MessageBox(L"TwoFingerScroll 1.0.4\n"
+	Application->MessageBox(L"TwoFingerScroll 1.0.5\n"
 		"\n"
 		"Copyright (c) 2008 Arkadiusz Wahlig\n"
 		"<arkadiusz.wahlig@gmail.com>\n"

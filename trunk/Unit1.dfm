@@ -49,10 +49,6 @@ object Form1: TForm1
     object generalTab: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox4: TGroupBox
         Left = 3
         Top = 3
@@ -72,10 +68,6 @@ object Form1: TForm1
     end
     object scrollTab: TTabSheet
       Caption = 'Scrolling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -240,16 +232,30 @@ object Form1: TForm1
         object Label2: TLabel
           Left = 16
           Top = 24
-          Width = 90
+          Width = 83
           Height = 13
-          Caption = 'Two finger tapping'
+          Caption = 'One + one finger'
         end
         object Label3: TLabel
+          Left = 152
+          Top = 83
+          Width = 64
+          Height = 13
+          Caption = 'Three fingers'
+        end
+        object Label4: TLabel
+          Left = 152
+          Top = 24
+          Width = 56
+          Height = 13
+          Caption = 'Two fingers'
+        end
+        object Label5: TLabel
           Left = 16
           Top = 83
-          Width = 98
+          Width = 83
           Height = 13
-          Caption = 'Three finger tapping'
+          Caption = 'Two + one finger'
         end
         object tapMaxDistance: TTrackBar
           Left = 16
@@ -262,10 +268,10 @@ object Form1: TForm1
           Position = 5
           TabOrder = 0
         end
-        object tapTwo: TComboBox
+        object tapOneOne: TComboBox
           Left = 16
           Top = 43
-          Width = 257
+          Width = 121
           Height = 19
           Style = csOwnerDrawFixed
           ItemHeight = 13
@@ -281,14 +287,50 @@ object Form1: TForm1
             'Button 5')
         end
         object tapThree: TComboBox
-          Left = 16
+          Left = 152
           Top = 102
-          Width = 257
+          Width = 121
           Height = 19
           Style = csOwnerDrawFixed
           ItemHeight = 13
           ItemIndex = 0
           TabOrder = 2
+          Text = 'Disabled'
+          Items.Strings = (
+            'Disabled'
+            'Left button'
+            'Middle button'
+            'Right button'
+            'Button 4'
+            'Button 5')
+        end
+        object tapTwo: TComboBox
+          Left = 152
+          Top = 43
+          Width = 121
+          Height = 19
+          Style = csOwnerDrawFixed
+          ItemHeight = 13
+          ItemIndex = 0
+          TabOrder = 3
+          Text = 'Disabled'
+          Items.Strings = (
+            'Disabled'
+            'Left button'
+            'Middle button'
+            'Right button'
+            'Button 4'
+            'Button 5')
+        end
+        object tapTwoOne: TComboBox
+          Left = 16
+          Top = 102
+          Width = 121
+          Height = 19
+          Style = csOwnerDrawFixed
+          ItemHeight = 13
+          ItemIndex = 0
+          TabOrder = 4
           Text = 'Disabled'
           Items.Strings = (
             'Disabled'

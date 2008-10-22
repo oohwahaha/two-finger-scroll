@@ -317,28 +317,24 @@ void __fastcall TForm1::AcquirePad(bool acquire)
 
 void __fastcall TForm1::LockDeviceTap(bool lock)
 {
-	if (lock) {
-		if (deviceTapLockLevel == 0) {
-			synTouchPad->GetProperty(SP_Gestures,
-				&synTouchPadGestures);
-			if (synTouchPadGestures & SF_GestureTap) {
-				synTouchPad->SetProperty(SP_Gestures,
-					synTouchPadGestures & ~SF_GestureTap);
+	long gest;
+
+	if (lock != synTapLocked) {
+		if (lock) {
+			synTouchPad->GetProperty(SP_Gestures, &gest);
+			if (gest & SF_GestureTap) {
+				synTouchPad->SetProperty(SP_Gestures, gest & (~SF_GestureTap));
+				synTapState = true;
 			}
+			else synTapState = false;
 		}
-		deviceTapLockLevel++;
-	}
-	else if (deviceTapLockLevel != 0) {
-		if (deviceTapLockLevel == 1) {
-			long g = synTouchPadGestures;
-			synTouchPad->GetProperty(SP_Gestures,
-				&synTouchPadGestures);
-			if (g & SF_GestureTap != synTouchPadGestures & SF_GestureTap) {
-				synTouchPad->SetProperty(SP_Gestures,
-					synTouchPadGestures & ~SF_GestureTap | (g & SF_GestureTap));
-			}
+		else {
+			synTouchPad->GetProperty(SP_Gestures, &gest);
+			if (synTapState) gest |= SF_GestureTap;
+			else gest &= ~SF_GestureTap;
+			synTouchPad->SetProperty(SP_Gestures, gest);
 		}
-		deviceTapLockLevel--;
+		synTapLocked = lock;
 	}
 }
 //---------------------------------------------------------------------------
@@ -396,40 +392,37 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 	synPacket->GetProperty(SP_YDelta, &yd);
 
 	// handle tapping
-	if (tapTwo->ItemIndex > 0) {
-		if (fstate & SF_FingerPresent) {
-			if (nof > tapMaxFingers) tapMaxFingers = nof;
+	if (nof > tapLastNof) {
+		if (nof >= 2) {
+			synPacket->GetProperty(SP_TimeStamp,
+				&tapStartTime);
+			tapDistance = 0;
+			LockDeviceTap(true);
 		}
-		else tapMaxFingers = 0;
-		if ((nof == 2) && (tapMaxFingers == 2)) {
-			if (!tapInProgress) {
-				tapInProgress = true;
-				synPacket->GetProperty(SP_TimeStamp,
-					&tapStartTime);
-				tapDistance = 0;
-				GetCursorPos(&tapTouchPos);
-				LockDeviceTap(true);
-			}
-			if (abs(xd) < 800) tapDistance += abs(xd);
-			if (abs(yd) < 800) tapDistance += abs(yd);
-		}
-		else if (tapInProgress) {
-			tapInProgress = false;
-			LockDeviceTap(false);
-			long tstamp;
-			synPacket->GetProperty(SP_TimeStamp, &tstamp);
-			if ((nof < 2) &&
-				(tstamp - tapStartTime < 175) &&
-				(tapDistance < tapMaxDistance->Position))
-			{
-				SetCursorPos(tapTouchPos.x,
-					tapTouchPos.y);
+		else GetCursorPos(&tapTouchPos);
+	}
+	else if (nof < tapLastNof) {
+		LockDeviceTap(false);
+		long tstamp;
+		synPacket->GetProperty(SP_TimeStamp, &tstamp);
+		if ((tstamp - tapStartTime < 175) &&
+			(tapDistance < tapMaxDistance->Position))
+		{
+			SetCursorPos(tapTouchPos.x,
+				tapTouchPos.y);
 
-				DoTap();
-				return 0;
-			}
+			if (tapLastNof == 2)
+				DoTap(tapTwo->ItemIndex);
+			else if (tapLastNof == 3)
+				DoTap(tapThree->ItemIndex);
+
+			tapLastNof = nof;
+			return 0;
 		}
 	}
+	tapLastNof = nof;
+	if (abs(xd) < 800) tapDistance += abs(xd);
+	if (abs(yd) < 800) tapDistance += abs(yd);
 
 	// handle scrolling
 	if (scrollLinear->Checked) {
@@ -509,10 +502,12 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm1::DoTap()
+void __fastcall TForm1::DoTap(int index)
 {
 	INPUT i[2];
-	const TTapInfo *info = &tapInfo[tapTwo->ItemIndex];
+	const TTapInfo *info = &tapInfo[index];
+
+	if (info->eventDown == 0) return; // tapping disabled
 
 	ZeroMemory(i, sizeof(INPUT)*2);
 	i[0].type = INPUT_MOUSE;
@@ -535,6 +530,7 @@ void __fastcall TForm1::DoScroll(long dx, long dy)
 	// scrollSpeed
 	dy = dy * scrollSpeed->Position / 100;
 
+	// scrollAcc
 	if (scrollAccEnabled->Checked) {
 		d = dy * dy / (scrollAcc->Max - scrollAcc->Position + scrollAcc->Min);
 		if (d < 4)

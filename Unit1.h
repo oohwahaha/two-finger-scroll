@@ -52,12 +52,16 @@ __published:	// IDE-verwaltete Komponenten
 	TLabel *tapMaxDistanceLabel;
 	TTrackBar *tapMaxDistance;
 	TCheckBox *scrollAccEnabled;
-	TComboBox *tapTwo;
+	TComboBox *tapOneOne;
 	TLabel *Label2;
 	TLabel *Label3;
 	TComboBox *tapThree;
 	TTrackBar *scrollSpeed;
 	TLabel *scrollSpeedLabel;
+	TComboBox *tapTwo;
+	TLabel *Label4;
+	TLabel *Label5;
+	TComboBox *tapTwoOne;
 	void __fastcall Settings1Click(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall scrollLinearClick(TObject *Sender);
@@ -80,9 +84,9 @@ private:	// Benutzer Deklarationen
 	ISynPacket *synPacket;
 	bool IsPadAcquired;
 	bool synTapState;
-	bool synTapLocked;
+	bool IsDeviceTapLocked;
 	long tapLastNof;
-	long tapStartTime, scrollTouchTime;
+	long tapStartTime, tapTouchTime, scrollTouchTime;
 	long tapDistance;
 	POINT tapTouchPos, scrollTouchPos;
 	long scrollBuffer;
@@ -93,8 +97,8 @@ private:	// Benutzer Deklarationen
 	void __fastcall SettingsSave();
 	void __fastcall AcquirePad(bool);
 	void __fastcall LockDeviceTap(bool);
-	void __fastcall DoTap(int);
-	void __fastcall DoScroll(long, long);
+	bool __fastcall DoTap(int);
+	bool __fastcall DoScroll(long, long);
 public:		// Benutzer Deklarationen
 	__fastcall TForm1(TComponent* Owner);
 };

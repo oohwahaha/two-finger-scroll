@@ -58,21 +58,6 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<ResFiles Include="TwoFingerScroll.res">
-				<BuildOrder>1</BuildOrder>
-			</ResFiles>
-			<CppCompile Include="TwoFingerScroll.cpp">
-				<BuildOrder>0</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="Unit1.cpp">
-				<Form>Form1</Form>
-				<DependentOn>Unit1.h</DependentOn>
-				<BuildOrder>2</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="SYNCOMLib_OCX.cpp">
-				<DependentOn>SYNCOMLib_OCX.h</DependentOn>
-				<BuildOrder>3</BuildOrder>
-			</CppCompile>
 			<CppCompile Include="SYNCOMLib_TLB.cpp">
 				<DependentOn>SYNCOMLib_TLB.h</DependentOn>
 				<BuildOrder>4</BuildOrder>
@@ -85,6 +70,21 @@
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>6</BuildOrder>
 			</LibFiles>
+			<CppCompile Include="SYNCOMLib_OCX.cpp">
+				<DependentOn>SYNCOMLib_OCX.h</DependentOn>
+				<BuildOrder>3</BuildOrder>
+			</CppCompile>
+			<ResFiles Include="TwoFingerScroll.res">
+				<BuildOrder>1</BuildOrder>
+			</ResFiles>
+			<CppCompile Include="TwoFingerScroll.cpp">
+				<BuildOrder>0</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="Unit1.cpp">
+				<Form>Form1</Form>
+				<DependentOn>Unit1.h</DependentOn>
+				<BuildOrder>2</BuildOrder>
+			</CppCompile>
 			<FormResources Include="Unit1.dfm"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>

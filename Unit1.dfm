@@ -49,6 +49,10 @@ object Form1: TForm1
     object generalTab: TTabSheet
       Caption = 'General'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox4: TGroupBox
         Left = 3
         Top = 3
@@ -68,6 +72,10 @@ object Form1: TForm1
     end
     object scrollTab: TTabSheet
       Caption = 'Scrolling'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3

@@ -399,7 +399,8 @@ HRESULT STDMETHODCALLTYPE TForm1::OnSynDevicePacket(long seqNum)
 			tapDistance = 0;
 			LockDeviceTap(true);
 		}
-		else GetCursorPos(&tapTouchPos);
+		if (tapLastNof == 0)
+			GetCursorPos(&tapTouchPos);
 	}
 	else if (nof < tapLastNof) {
 		LockDeviceTap(false);

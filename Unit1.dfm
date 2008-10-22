@@ -44,7 +44,7 @@ object Form1: TForm1
     Top = 8
     Width = 305
     Height = 297
-    ActivePage = scrollTab
+    ActivePage = tapTab
     TabOrder = 2
     object generalTab: TTabSheet
       Caption = 'General'
@@ -215,8 +215,6 @@ object Form1: TForm1
     object tapTab: TTabSheet
       Caption = 'Tapping'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 28
       object GroupBox5: TGroupBox
         Left = 3
         Top = 3
@@ -244,7 +242,6 @@ object Form1: TForm1
           Width = 98
           Height = 13
           Caption = 'Three finger tapping'
-          Enabled = False
         end
         object tapMaxDistance: TTrackBar
           Left = 16
@@ -281,7 +278,6 @@ object Form1: TForm1
           Width = 257
           Height = 19
           Style = csOwnerDrawFixed
-          Enabled = False
           ItemHeight = 13
           ItemIndex = 0
           TabOrder = 2

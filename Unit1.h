@@ -79,10 +79,9 @@ private:	// Benutzer Deklarationen
 	TSynDevice *synTouchPad;
 	ISynPacket *synPacket;
 	bool IsPadAcquired;
-	int deviceTapLockLevel;
-	long synTouchPadGestures;
-	int tapMaxFingers;
-	bool tapInProgress;
+	bool synTapState;
+	bool synTapLocked;
+	long tapLastNof;
 	long tapStartTime, scrollTouchTime;
 	long tapDistance;
 	POINT tapTouchPos, scrollTouchPos;
@@ -94,7 +93,7 @@ private:	// Benutzer Deklarationen
 	void __fastcall SettingsSave();
 	void __fastcall AcquirePad(bool);
 	void __fastcall LockDeviceTap(bool);
-	void __fastcall DoTap();
+	void __fastcall DoTap(int);
 	void __fastcall DoScroll(long, long);
 public:		// Benutzer Deklarationen
 	__fastcall TForm1(TComponent* Owner);

@@ -9,7 +9,6 @@
 #include <psapi.h>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
-#pragma link "SYNCTRLLib_OCX"
 #pragma link "SYNCOMLib_OCX"
 #pragma resource "*.dfm"
 
@@ -43,7 +42,7 @@ UnicodeString __fastcall GetForegroundWindowBaseModuleName()
 		GetWindowThreadProcessId(hWnd, &dwProcessId);
 		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
 			PROCESS_VM_READ, false, dwProcessId);
-		if (hProcess) {
+		if (hProcess != NULL) {
 			HMODULE hMod;
 			DWORD cbNeeded;
 
@@ -51,6 +50,7 @@ UnicodeString __fastcall GetForegroundWindowBaseModuleName()
 				char szModule[MAX_PATH];
 
 				GetModuleBaseName(hProcess, hMod, szModule, MAX_PATH);
+				CloseHandle(hProcess);
 				return UnicodeString(szModule);
 			}
 
@@ -78,6 +78,7 @@ int __fastcall GetScrollMode()
 			}
 			reg->CloseKey();
 		}
+		delete reg;
 	}
 	return mode;
 }
@@ -102,6 +103,7 @@ void __fastcall SetScrollMode(int mode)
             }
 			reg->CloseKey();
 		}
+		delete reg;
 	}
 }
 //---------------------------------------------------------------------------
@@ -612,9 +614,9 @@ void __fastcall TForm1::cancelClick(TObject *Sender)
 
 void __fastcall TForm1::About1Click(TObject *Sender)
 {
-	Application->MessageBox(L"TwoFingerScroll 1.0.5\n"
+	Application->MessageBox(L"TwoFingerScroll 1.0.6\n"
 		"\n"
-		"Copyright (c) 2008 Arkadiusz Wahlig\n"
+		"Copyright (c) 2008, 2009 Arkadiusz Wahlig\n"
 		"<arkadiusz.wahlig@gmail.com>\n"
 		"\n"
 		"Published under the Apache 2.0 License.\n"

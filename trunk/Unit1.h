@@ -11,7 +11,6 @@
 #include <ExtCtrls.hpp>
 #include <Menus.hpp>
 #include <Registry.hpp>
-#include "SYNCTRLLib_OCX.h"
 #include <OleCtrls.hpp>
 #include "SYNCOMLib_OCX.h"
 #include <AppEvnts.hpp>
